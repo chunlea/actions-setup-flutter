@@ -25,8 +25,8 @@ if (!tempDirectory) {
 }
 
 interface IFlutterVersion {
-  baseUrl: string;
-  currentRelease: IFlutterCurrentVersion;
+  base_url: string;
+  current_release: IFlutterCurrentVersion;
   releases: IFlutterRelease[];
 }
 
@@ -105,11 +105,11 @@ export async function queryFlutterVersion(): Promise<IFlutterVersion> {
 export function getFlutterRelease(versionSpec: string, flutterVersion: IFlutterVersion): IFlutterRelease | undefined {
   switch (versionSpec) {
     case 'stable':
-      return flutterVersion.releases.find(release => release.hash == flutterVersion.currentRelease.stable);
+      return flutterVersion.releases.find(release => release.hash == flutterVersion.current_release.stable);
     case 'beta':
-      return flutterVersion.releases.find(release => release.hash == flutterVersion.currentRelease.beta);
+      return flutterVersion.releases.find(release => release.hash == flutterVersion.current_release.beta);
     case 'dev':
-      return flutterVersion.releases.find(release => release.hash == flutterVersion.currentRelease.dev);
+      return flutterVersion.releases.find(release => release.hash == flutterVersion.current_release.dev);
     default:
       return flutterVersion.releases.find(release => release.version == versionSpec);
     }
@@ -119,7 +119,10 @@ async function acquireFlutter(release: IFlutterRelease, flutterVersion: IFlutter
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
-  let downloadUrl = `${flutterVersion.baseUrl}/${release.archive}`;
+  let downloadUrl = `${flutterVersion.base_url}/${release.archive}`;
+  let fileName = release.archive.split('/').pop() || '';
+
+  console.log(`the file name is ${fileName} and ${path.extname(fileName)}`);
 
   let downloadPath: string;
 
@@ -135,8 +138,18 @@ async function acquireFlutter(release: IFlutterRelease, flutterVersion: IFlutter
   //
   // Extract
   //
-  let destPath: string = path.join(__dirname, release.hash);
-  let extPath: string = await tc.extractZip(downloadPath, destPath);
+  let extPath: string;
+  switch (path.extname(fileName)) {
+    case '.zip':
+      extPath = await tc.extractZip(downloadPath);
+      break;
+    case '.7z':
+      extPath = await tc.extract7z(downloadPath);
+      break;
+    default:
+      extPath = await tc.extractTar(downloadPath);
+      break;
+  }
 
   //
   // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
