@@ -1,10 +1,10 @@
-name: 'Node 12 Template Action'
-description: 'Get started with Node actions'
-author: 'GitHub'
-inputs: 
-  myInput:
-    description: 'Input to use'
-    default: 'world'
+name: 'Setup Flutter environment'
+description: 'Setup a Flutter environment and add it to the PATH'
+author: 'Chunlea'
+inputs:
+  flutter-version:
+    description: 'Different Flutter version to use, like: v1.9.1, or using `stable`, `beta`, `dev` for the lastest version in channel.'
+    default: 'stable'
 runs:
   using: 'node12'
   main: 'lib/main.js'
