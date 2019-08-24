@@ -154,6 +154,6 @@ async function acquireFlutter(release: IFlutterRelease, flutterVersion: IFlutter
   //
   // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
   //
-  let toolRoot = path.join(extPath);
+  let toolRoot = path.join(extPath, 'flutter');
   return await tc.cacheDir(toolRoot, 'flutter', release.hash);
 }
